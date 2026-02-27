@@ -4,14 +4,14 @@ using CodeBase.Infrastructure.States.StateMachine;
 
 namespace CodeBase.Infrastructure.States.GameStates
 {
-    public class LoadingBattleState : SimpleState
+    public class LoadingRoofState : SimpleState
     {
-        private const string FightSceneName = "BattleScene";
+        private const string RoofSceneName = "RoofScene";
         
         private readonly ISceneLoader _sceneLoader;
         private readonly IGameStateMachine _stateMachine;
 
-        public LoadingBattleState(ISceneLoader sceneLoader, IGameStateMachine stateMachine)
+        public LoadingRoofState(ISceneLoader sceneLoader, IGameStateMachine stateMachine)
         {
             _sceneLoader = sceneLoader;
             _stateMachine = stateMachine;
@@ -19,12 +19,12 @@ namespace CodeBase.Infrastructure.States.GameStates
         
         public override void Enter()
         {
-            _sceneLoader.LoadScene(FightSceneName, EnterBattleLoopState);
+            _sceneLoader.LoadScene(RoofSceneName, EnterRoofLoopState);
         }
 
-        private void EnterBattleLoopState()
+        private void EnterRoofLoopState()
         {
-            _stateMachine.Enter<BattleLoopState>();
+            _stateMachine.Enter<RoofLoopState>();
         }
 
     

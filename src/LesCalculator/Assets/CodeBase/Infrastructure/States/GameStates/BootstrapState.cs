@@ -18,7 +18,7 @@ namespace CodeBase.Infrastructure.States.GameStates
     {
       //_staticDataService.LoadAll();
       
-      _stateMachine.Enter<LoadingBattleState>();
+      _stateMachine.Enter<LoadingRoofState>();
     }
   }
 }

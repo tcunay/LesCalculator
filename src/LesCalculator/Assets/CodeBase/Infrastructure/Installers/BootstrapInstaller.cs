@@ -27,8 +27,8 @@ namespace CodeBase.Infrastructure.Installers
         private void BindStates()
         {
             Container.BindInterfacesAndSelfTo<BootstrapState>().AsSingle();
-            Container.BindInterfacesAndSelfTo<LoadingBattleState>().AsSingle();
-            Container.BindInterfacesAndSelfTo<BattleLoopState>().AsSingle();
+            Container.BindInterfacesAndSelfTo<LoadingRoofState>().AsSingle();
+            Container.BindInterfacesAndSelfTo<RoofLoopState>().AsSingle();
         }
 
         private void BindServices()
