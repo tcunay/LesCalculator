@@ -36,6 +36,11 @@ namespace CodeBase.RoofCalculator.Plan.UI
         [SerializeField] private Color _internalLinesColor = new Color(0.98f, 0.35f, 0.32f, 0.95f);
         [SerializeField, Min(1f)] private float _lineThickness = 3f;
 
+        [Header("Initialization")]
+        [SerializeField] private bool _createDefaultExternalContourIfEmpty = true;
+        [SerializeField, Min(3)] private int _defaultExternalPointsCount = 4;
+        [SerializeField] private bool _createOneInternalWallByDefault;
+
         [Header("Optional Output")]
         [SerializeField] private TMP_Text _summaryText;
 
@@ -70,6 +75,11 @@ namespace CodeBase.RoofCalculator.Plan.UI
             }
 
             NotifyChanged();
+        }
+
+        private void Start()
+        {
+            EnsureDefaultGeometry();
         }
 
         public void AddExternalPoint()
@@ -156,6 +166,26 @@ namespace CodeBase.RoofCalculator.Plan.UI
 
             _internalWalls.Clear();
             NotifyChanged();
+        }
+
+        [ContextMenu("Plan/Add External Point")]
+        private void ContextAddExternalPoint()
+        {
+            AddExternalPoint();
+        }
+
+        [ContextMenu("Plan/Add Internal Wall")]
+        private void ContextAddInternalWall()
+        {
+            AddInternalWall();
+        }
+
+        [ContextMenu("Plan/Reset Default Geometry")]
+        private void ContextResetDefaultGeometry()
+        {
+            ClearExternalPoints();
+            ClearInternalWalls();
+            EnsureDefaultGeometry();
         }
 
         public bool TryBuildPlanData(out BuildingPlanData planData, out string error)
@@ -340,6 +370,23 @@ namespace CodeBase.RoofCalculator.Plan.UI
         {
             UpdateSummary();
             PlanChanged?.Invoke();
+        }
+
+        private void EnsureDefaultGeometry()
+        {
+            if (_createDefaultExternalContourIfEmpty && _externalPoints.Count == 0)
+            {
+                int pointsToCreate = Mathf.Max(3, _defaultExternalPointsCount);
+                for (int i = 0; i < pointsToCreate; i++)
+                {
+                    AddExternalPoint();
+                }
+            }
+
+            if (_createOneInternalWallByDefault && _internalWalls.Count == 0)
+            {
+                AddInternalWall();
+            }
         }
 
         private void UpdateSummary()
