@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 
 namespace CodeBase.RoofCalculator.Plan
@@ -63,7 +64,7 @@ namespace CodeBase.RoofCalculator.Plan
                 return false;
             }
 
-            float signedArea = SignedPolygonArea(planData.OuterContourMeters);
+            float signedArea = CalculateSignedPolygonArea(planData.OuterContourMeters);
             float area = Mathf.Abs(signedArea);
             if (area < 0.001f)
             {
@@ -121,7 +122,56 @@ namespace CodeBase.RoofCalculator.Plan
             return true;
         }
 
-        private static float SignedPolygonArea(IReadOnlyList<Vector2> vertices)
+        public static string GetVertexLabel(int index)
+        {
+            if (index < 0)
+            {
+                return "?";
+            }
+
+            int letterIndex = index % 26;
+            int suffix = index / 26;
+            char letter = (char)('A' + letterIndex);
+
+            return suffix == 0
+                ? letter.ToString()
+                : letter + suffix.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public static float CalculateInteriorAngleDegrees(IReadOnlyList<Vector2> vertices, int vertexIndex)
+        {
+            if (vertices == null || vertices.Count < 3 || vertexIndex < 0 || vertexIndex >= vertices.Count)
+            {
+                return 0f;
+            }
+
+            int count = vertices.Count;
+            int previousIndex = (vertexIndex - 1 + count) % count;
+            int nextIndex = (vertexIndex + 1) % count;
+
+            Vector2 current = vertices[vertexIndex];
+            Vector2 toPrevious = vertices[previousIndex] - current;
+            Vector2 toNext = vertices[nextIndex] - current;
+
+            if (toPrevious.sqrMagnitude <= Mathf.Epsilon || toNext.sqrMagnitude <= Mathf.Epsilon)
+            {
+                return 0f;
+            }
+
+            float baseAngle = Vector2.Angle(toPrevious, toNext);
+            float cross = toPrevious.x * toNext.y - toPrevious.y * toNext.x;
+            float orientation = Mathf.Sign(CalculateSignedPolygonArea(vertices));
+
+            if (Mathf.Approximately(orientation, 0f))
+            {
+                return baseAngle;
+            }
+
+            bool isConvex = orientation * cross < 0f;
+            return isConvex ? baseAngle : 360f - baseAngle;
+        }
+
+        public static float CalculateSignedPolygonArea(IReadOnlyList<Vector2> vertices)
         {
             float area2 = 0f;
 
